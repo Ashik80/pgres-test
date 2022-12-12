@@ -1,0 +1,17 @@
+FROM postgres:15-alpine
+
+RUN apk add make
+
+RUN mkdir pgres-test
+
+WORKDIR pgres-test
+
+COPY Makefile .
+
+RUN mkdir migrations
+
+COPY migrations migrations
+
+RUN su postgres -c 'initdb -D /var/lib/postgresql/data/' && su postgres -c 'pg_ctl -D /var/lib/postgresql/data/ start' && make init-db && make db-upgrade
+
+CMD ["postgres"]
